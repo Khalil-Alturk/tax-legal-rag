@@ -78,7 +78,7 @@ def _read_validated_pdf(file: UploadFile, max_bytes: int) -> bytes:
     content = file.file.read(max_bytes + 1)
     if len(content) > max_bytes:
         raise HTTPException(
-            status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            status.HTTP_413_CONTENT_TOO_LARGE,
             f"File too large. Limit is {max_bytes // (1024 * 1024)} MB.",
         )
     if not content.startswith(b"%PDF-"):

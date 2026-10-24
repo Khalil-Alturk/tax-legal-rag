@@ -27,3 +27,29 @@ jobs:
       # No GOOGLE_API_KEY here: tests use fake LLM + embeddings; the live test is skipped.
       - name: Pytest
         run: pytest
+
+  docker:
+    # Proves the image builds and the API starts; runs only if lint + tests pass.
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t tax-legal-rag:ci .
+
+      # /health works without GOOGLE_API_KEY, so no secret is needed in CI.
+      - name: Start container and check /health
+        run: |
+          docker run -d --name api -p 8000:8000 tax-legal-rag:ci
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8000/health; then echo; exit 0; fi
+            sleep 1
+          done
+          echo "API did not become healthy in 30s"
+          docker logs api
+          exit 1
+
+      - name: Stop container
+        if: always()
+        run: docker rm -f api || true

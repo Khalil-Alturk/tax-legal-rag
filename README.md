@@ -124,7 +124,8 @@ are only in the server log).
 
 ### Example: English
 
-The response below is illustrative. Exact wording varies between model runs.
+These examples were captured from a live run (2026-10-24, `gemini-3.8-flash` +
+`gemini-embedding-001`) over the sample documents. Wording can vary slightly between runs.
 
 ```http
 POST /query
@@ -132,7 +133,7 @@ POST /query
 ```
 ```json
 {
-  "answer": "Late payment is penalised at 5 percent of the unpaid tax for each month or part of a month of delay [vat_regulation_en.pdf, 2].",
+  "answer": "The penalty for late payment is 5 percent of the unpaid tax for each month or part of a month of delay [vat_regulation_en.pdf, 2].",
   "citations": [
     {
       "file": "vat_regulation_en.pdf",
@@ -153,18 +154,31 @@ POST /query
 ```
 ```json
 {
-  "answer": "تبلغ نسبة ضريبة الاستقطاع على الإتاوات المدفوعة إلى غير مقيم 15 بالمئة [income_tax_regulation_ar.pdf, 1].",
+  "answer": "نسبة ضريبة الاستقطاع على الإتاوات المدفوعة لغير المقيم هي 15 بالمئة [income_tax_regulation_ar.pdf, 1].",
   "citations": [
     {
       "file": "income_tax_regulation_ar.pdf",
       "page": 1,
-      "snippet": "5 بالمئة على أرباح الأسهم، و15 بالمئة على الإتاوات، و20 بالمئة على أتعاب الإدارة"
+      "snippet": "يجب على كل مقيم يدفع مبالغ إلى غير مقيم أن يستقطع الضريبة بالنسب الآتية: 5 بالمئة على أرباح الأسهم، و15 بالمئة على الإتاوات"
     }
   ],
   "confidence": "high",
   "retrieved_chunks_count": 2
 }
 ```
+
+### Example: cross-language (English question, Arabic source)
+
+```json
+{"question": "What withholding tax rate applies to management fees paid to non-residents?"}
+→ {"answer": "A withholding tax rate of 20 percent applies to management fees paid by a resident to a non-resident [income_tax_regulation_ar.pdf, 1].",
+   "citations": [{"file": "income_tax_regulation_ar.pdf", "page": 1,
+                  "snippet": "... و15 بالمئة على الإتاوات، و20 بالمئة على أتعاب الإدارة."}],
+   "confidence": "high", "retrieved_chunks_count": 4}
+```
+
+The reverse works too: an Arabic question about the VAT registration threshold was
+answered in Arabic from the English regulation.
 
 ### Example: not in the documents
 
@@ -220,6 +234,14 @@ of duplicating them.
    are dropped, an answer with no valid citations is downgraded to `low` confidence, and
    when retrieval finds nothing the LLM isn't called at all.
 
+**Why there is no similarity-score threshold.** In the live run, the unanswerable
+questions scored about as high as the answerable ones: 0.61 for "corporate tax in Japan"
+vs 0.61 for a real question, and 0.73 for an Arabic question about an inheritance tax
+the documents don't contain. Cosine similarity measures *topic* overlap ("tax", "rate"),
+not whether the passage contains the answer. A fixed cut-off would either block good
+questions or let bad ones through, so the decision to refuse is left to the grounded
+prompt and checked by tests.
+
 **Prompt-injection guard.** Retrieved text is wrapped in `<source>` tags and the system
 prompt declares it untrusted data. `<` and `>` in document text are escaped, so a
 malicious PDF can't close the tag and pose as instructions.
@@ -249,6 +271,9 @@ Tests swap in a bag-of-words fake embedder and a fake grounded LLM through
 - No authentication, rate limiting or multi-tenant separation on the API.
 - Local Chroma is single-node and fits a demo or a small team, not firm-wide scale.
 - Language detection is a simple Arabic-vs-Latin character ratio (two languages only).
+- When answering across languages the model translates. In the live run it rendered the
+  currency code "EXD" as "دينار إكسامبلي", a name the document never uses. Citations
+  keep the original-language snippet so a reviewer can check the source wording.
 - The sample documents are **fictional** and must not be used as tax advice.
 
 ## Next steps

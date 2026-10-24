@@ -77,3 +77,10 @@ def test_committed_arabic_sample_extracts_in_logical_order():
     text = " ".join(pages[0].text.split())
     assert "تفرض ضريبة الدخل على الشركات المقيمة بنسبة 20 بالمئة" in text
     assert all(detect_language(p.text) == "ar" for p in pages)
+
+
+def test_new_format_api_key_is_redacted_without_configured_secret():
+    fake_key = "AQ." + "Ab8_x-" * 8
+    record = logging.LogRecord("t", logging.INFO, "", 0, "url?key=%s", (fake_key,), None)
+    RedactSecretsFilter(secret=None).filter(record)
+    assert fake_key not in record.getMessage()

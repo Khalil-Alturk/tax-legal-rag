@@ -3,8 +3,8 @@
 import logging
 import re
 
-# Google API keys start with "AIza" followed by 35 URL-safe characters.
-_KEY_PATTERN = re.compile(r"AIza[0-9A-Za-z_\-]{35}")
+# Google API keys: classic "AIza" + 35 chars, or the newer "AQ." prefixed format.
+_KEY_PATTERN = re.compile(r"AIza[0-9A-Za-z_\-]{35}|AQ\.[0-9A-Za-z_\-]{20,}")
 
 
 class RedactSecretsFilter(logging.Filter):

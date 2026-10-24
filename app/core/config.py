@@ -16,7 +16,8 @@ class Settings(BaseSettings):
     google_api_key: SecretStr | None = None
     llm_model: str = "gemini-3.8-flash"
     embedding_model: str = "gemini-embedding-001"
-    llm_temperature: float = 0.0
+    # None = model default. Gemini 3.x is tuned for 1.0; lowering it can cause looping.
+    llm_temperature: float | None = None
 
     data_dir: Path = Path("data")
     chroma_dir: Path = Path("chroma_db")

@@ -41,14 +41,17 @@ def build_embeddings(settings: Settings) -> Embeddings:
 
 
 def build_llm(settings: Settings) -> BaseChatModel:
-    """Gemini chat model. temperature=0 keeps answers deterministic and close to the text."""
+    """Gemini chat model; built-in retries cover transient errors and rate limits."""
     from langchain_google_genai import ChatGoogleGenerativeAI
 
+    kwargs = {}
+    if settings.llm_temperature is not None:
+        kwargs["temperature"] = settings.llm_temperature
     return ChatGoogleGenerativeAI(
         model=settings.llm_model,
         google_api_key=_require_key(settings),
-        temperature=settings.llm_temperature,
         max_retries=settings.embed_max_retries,
+        **kwargs,
     )
 
 

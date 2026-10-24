@@ -1,0 +1,12 @@
+.env
+.venv/
+.git/
+.github/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+chroma_db/
+data/uploads/
+tests/
+scripts/

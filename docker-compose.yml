@@ -1,0 +1,18 @@
+services:
+  api:
+    build: .
+    image: tax-legal-rag:latest
+    ports:
+      - "8000:8000"
+    # GOOGLE_API_KEY and model names come from .env (never baked into the image).
+    env_file: .env
+    environment:
+      CHROMA_DIR: /app/chroma_db
+      DATA_DIR: /app/data
+    volumes:
+      - chroma_data:/app/chroma_db   # index survives container restarts
+      - ./data:/app/data             # drop PDFs here, then POST /ingest
+    restart: unless-stopped
+
+volumes:
+  chroma_data:

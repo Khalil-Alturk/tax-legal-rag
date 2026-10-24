@@ -62,4 +62,5 @@ class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
     llm_model: str
     embedding_model: str
-    indexed_chunks: int
+    api_key_configured: bool
+    indexed_chunks: int | None = Field(None, description="None if the store can't be opened")

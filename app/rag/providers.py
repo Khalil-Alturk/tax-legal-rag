@@ -66,7 +66,9 @@ def get_llm() -> BaseChatModel:
 def get_vector_store() -> Chroma:
     """Persistent local Chroma collection using cosine distance."""
     settings = get_settings()
-    logger.info("Opening Chroma at %s (collection=%s)", settings.chroma_dir, settings.collection_name)
+    logger.info(
+        "Opening Chroma at %s (collection=%s)", settings.chroma_dir, settings.collection_name
+    )
     return Chroma(
         collection_name=settings.collection_name,
         embedding_function=get_embeddings(),

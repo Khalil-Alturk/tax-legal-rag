@@ -113,6 +113,8 @@ def load_and_chunk(paths: list[Path], chunk_size: int, chunk_overlap: int) -> li
     for path in paths:
         pages = load_pdf_pages(path)
         file_docs = chunk_pages(pages, chunk_size, chunk_overlap)
-        logger.info("Parsed %s: %d pages with text, %d chunks", path.name, len(pages), len(file_docs))
+        logger.info(
+            "Parsed %s: %d pages with text, %d chunks", path.name, len(pages), len(file_docs)
+        )
         docs.extend(file_docs)
     return docs

@@ -32,9 +32,7 @@ def setup_logging(level: str = "INFO", secret: str | None = None) -> None:
     if not any(getattr(h, "_rag_handler", False) for h in root.handlers):
         handler = logging.StreamHandler()
         handler._rag_handler = True  # type: ignore[attr-defined]
-        handler.setFormatter(
-            logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
-        )
+        handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
         root.addHandler(handler)
     for handler in root.handlers:
         handler.filters = [f for f in handler.filters if not isinstance(f, RedactSecretsFilter)]

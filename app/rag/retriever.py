@@ -9,7 +9,9 @@ from langchain_core.vectorstores import VectorStore
 logger = logging.getLogger(__name__)
 
 
-def build_filter(file_name: str | None = None, language: str | None = None) -> dict[str, Any] | None:
+def build_filter(
+    file_name: str | None = None, language: str | None = None
+) -> dict[str, Any] | None:
     """Translate API filters into a Chroma `where` clause.
 
     Chroma allows one condition per dict, so two conditions must be wrapped in $and.

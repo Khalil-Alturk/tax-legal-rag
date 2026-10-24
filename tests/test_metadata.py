@@ -67,3 +67,13 @@ def test_api_key_is_redacted_from_logs():
     RedactSecretsFilter(secret=fake_key).filter(record)
     assert fake_key not in record.getMessage()
     assert "***" in record.getMessage()
+
+
+def test_committed_arabic_sample_extracts_in_logical_order():
+    """Regression: sort=True reversed Arabic word order; words must read right-to-left."""
+    from pathlib import Path
+
+    pages = load_pdf_pages(Path("data/income_tax_regulation_ar.pdf"))
+    text = " ".join(pages[0].text.split())
+    assert "تفرض ضريبة الدخل على الشركات المقيمة بنسبة 20 بالمئة" in text
+    assert all(detect_language(p.text) == "ar" for p in pages)

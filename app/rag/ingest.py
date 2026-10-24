@@ -66,7 +66,8 @@ def load_pdf_pages(path: Path) -> list[PageText]:
     pages: list[PageText] = []
     with pymupdf.open(path) as doc:
         for index, page in enumerate(doc, start=1):
-            text = clean_text(page.get_text("text", sort=True))
+            # No sort=True: sorting spans left-to-right reverses word order in Arabic lines.
+            text = clean_text(page.get_text("text"))
             if text:
                 pages.append(PageText(file_name=path.name, page=index, text=text))
             else:

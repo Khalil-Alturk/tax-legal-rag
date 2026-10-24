@@ -1,0 +1,22 @@
+# Secrets: only .env.example is committed
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Local vector store (rebuilt by /ingest)
+chroma_db/
+
+# Uploaded PDFs land in data/uploads/
+data/uploads/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
